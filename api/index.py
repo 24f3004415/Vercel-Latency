@@ -70,4 +70,4 @@ def latency(payload: RequestPayload):
             "avg_uptime": sum(up) / len(up),
             "breaches": sum(1 for v in lat if v > payload.threshold_ms),
         }
-    return result
+    return {"regions": result}
