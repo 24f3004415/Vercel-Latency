@@ -35,12 +35,17 @@ def percentile(values, p):
 
 
 @app.get("/")
+@app.get("/api")
+@app.get("/api/index")
+@app.get("/api/latency")
 def root():
     return {"message": "Latency API is running"}
 
 
-@app.post("/api/latency")
 @app.post("/")
+@app.post("/api")
+@app.post("/api/index")
+@app.post("/api/latency")
 def latency(payload: RequestPayload):
     result = {}
     for reg in payload.regions:
