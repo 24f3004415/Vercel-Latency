@@ -2,18 +2,28 @@ import json
 import os
 from typing import List
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel
 
 app = FastAPI()
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "*",
+    "Access-Control-Allow-Headers": "*",
+}
+
+
+@app.middleware("http")
+async def add_cors_headers(request: Request, call_next):
+    # Answer preflight requests directly
+    if request.method == "OPTIONS":
+        return Response(status_code=200, headers=CORS_HEADERS)
+    response = await call_next(request)
+    for key, value in CORS_HEADERS.items():
+        response.headers[key] = value
+    return response
+
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), "q-vercel-latency.json")
 with open(DATA_PATH) as f:
