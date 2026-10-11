@@ -7,22 +7,20 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Expose-Headers": "Access-Control-Allow-Origin",
+}
+
 
 @app.middleware("http")
 async def add_cors_headers(request: Request, call_next):
-    headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": request.headers.get(
-            "access-control-request-headers", "*"
-        ),
-        "Access-Control-Max-Age": "86400",
-    }
-    # Answer preflight requests directly
     if request.method == "OPTIONS":
-        return Response(status_code=204, headers=headers)
+        return Response(status_code=200, headers=CORS_HEADERS)
     response = await call_next(request)
-    for key, value in headers.items():
+    for key, value in CORS_HEADERS.items():
         response.headers[key] = value
     return response
 
